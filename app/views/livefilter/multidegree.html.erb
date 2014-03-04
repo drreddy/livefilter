@@ -1,0 +1,389 @@
+<style>
+  #filters{
+    display: inline-block;
+    padding: 19px;
+    margin-bottom: 20px;
+    background-color: #f5f5f5;
+    border: 1px solid #e3e3e3;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+    width:inherit;
+  }
+  #filters div{
+    float: left;
+    padding:5px;
+    color: lightslategray;
+    opacity: 0.6;
+    font-size: 12px;
+  }
+  #filters p{
+    font-weight:900;
+  }
+  #close{
+    font-weight:900; 
+    font-size:8px; 
+    color:black; 
+    cursor:pointer;
+    padding: 1px;
+  }
+</style>
+
+<div class="container">
+  <section id="typeahead">
+    <div class="page-header">
+      <h1>Live Filter
+            <small>ajax + rails filter search application</small>
+            <p style="float:right; font-size: 16px; font-weight: normal; text-align: right; margin: 0; line-height: normal; color: #999999; -webkit-margin-before: 1em;">Developed By: <b><a href="http://drreddy.herokuapp.com" target="none">Rajeev Reddy</a></b><br>Data Source: <b>IMDB</b></p>
+      </h1>
+    </div>
+
+    <div class="row" >
+      <div class="span4 columns" id="doc">
+          <h3>Results:&nbsp; <%= @debug %> <img class="loader" style="float:right; display:none; "src="http://ebuzz.herokuapp.com/loading.gif" /></h3>
+          <div class="reswrapper" style="max-height: 600px; overflow:auto;">
+          <% @data.each do |data| %>
+            <div class="res">
+              <div style="width:100%;">
+                <a href='<%= data['link'] %>'><%= data['title'] %></a><span style="float:right;"><b>Year</b> : <%= data['year'] %></span>
+              </div>
+              <ul style="list-style-type:none; margin: 5px 0 5px 15px;">
+                <li style="padding:1px;"><b>Genre</b> : <%= data['genre'] %></li>
+                <li style="padding:1px;"><b>Rating</b> : <%= data['rating'] %> / 10</li>
+                <li style="padding:1px;"><b>Runtime </b>(mins) : <%= data['runtime'] %></li>
+              </ul>
+            </div>
+          <% end %>
+          </div>
+      </div>
+      <div class="span8 columns">
+        <div id="filters" data-cat=""><p>Active Filters: </p><div class="name_filter" data-value=""></div><div class="genre_filter" data-value=""></div><div class="rating_filter" data-value=""></div><div class="year_filter" data-value=""></div><div class="runtime_filter" data-value=""></div></div>
+        <h2>Search Params</h2>
+        <p>Name</p>
+        <div class="well">
+          Filter by name: &nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="titleinput" onchange="filterbytitle(this.value)" class="input-xlarge" onchange="retreiveData(this.value)" value="" style="margin-bottom: 0px;" placeholder="name"/> 
+        </div>
+        <p>Genre</p>
+        <div class="well">
+          Filter by genre: &nbsp;&nbsp;&nbsp;&nbsp;
+            <select id="genreinput" onchange="filterbygenre(this.value)" style="margin-bottom: 0px;" class="span2 input-large">
+                <option value=" " disabled selected>Select Genre</option>
+                <option value="action">Action</option>
+                <option value="adventure">Adventure</option>
+                <option value="fantasy">Fantasy</option>
+                <option value="family">Family</option>
+                <option value="mystery">Mystery</option>
+                <option value="romance">Romance</option>
+                <option value="thriller">Thriller</option>
+                <option value="comedy">Comedy</option>
+                <option value="sci_fi">Science fiction</option>
+                <option value="horror">Horror</option>
+            </select>
+        </div>
+        <p>IMDB Rating</p>
+        <div class="well" id="ratinginput" >
+          Filter by IMDB Rating: <b>1 </b> &nbsp;&nbsp;&nbsp;<input type="text" class="span2" value="" data-slider-min="1" data-slider-max="10" data-slider-step="0.1" data-slider-value="[3.5,7.5]" id="sl2" style=""> &nbsp;&nbsp;&nbsp;<b> 10</b>
+        </div>
+        <p>Year range</p>
+        <div class="well" id="yearinput">
+          Filter by Year range: <b>1994 </b> &nbsp;&nbsp;&nbsp;<input type="text" class="span2" value="" data-slider-min="1994" data-slider-max="2011" data-slider-step="1" data-slider-value="[2000,2005]" id="sl3" style=""> &nbsp;&nbsp;&nbsp;<b> 2011</b>
+        </div>
+        <p>Runtime (mins)</p>
+        <div class="well" id="runtimeinput">
+          Filter by Runtime: <b>30 min </b> &nbsp;&nbsp;&nbsp;<input type="text" data-slider-min="30" data-slider-max="210" data-slider-step="1" class="span2" data-slider-value="152" id="sl1" style=""> &nbsp;&nbsp;&nbsp;<b>210 min </b>
+        </div>
+        <p id ="title" class="title" style="display:none;" ></p>
+        <p id ="genre" class="runtime" style="display:none;" ></p>
+        <p id ="rating" class="rating" style="display:none;" ></p>
+        <p id ="year" class="year" style="display:none;" ></p>
+        <p id ="runtime" class="runtime" style="display:none;"></p>
+        <p id ="valdebug" style="display:none;"></p>
+      </div>
+    </div>
+    <div class="row">
+      <div calss="span12">
+        <hr style="margin: 20px 0 5px 0;" />
+        <center><span style="color: #999999; font-size: 12px; font-weight: 900;">© 2014 <a href="http://drreddy.herokuapp.com" target="none">D Rajeev Reddy</a> </span></center>
+      </div>
+    </div>
+
+  </section>
+</div>
+
+<script src="/js/prettify.js"></script>
+<script src="/js/modernizr.js"></script>
+<script src="/js/bootstrap-slider.js"></script>
+<script>
+
+  $(function(){
+    window.prettyPrint && prettyPrint();
+
+      //$("#title").text($("#titleinput").val());
+      //$("#genre").text($("#genreinput").val());
+
+      $('#sl1').slider({
+        formater: function(value) {
+          $("#runtime").text(value);
+          return 'Runtime: '+value+' mins';
+        }
+      }).on('slideStop', function(ev){
+        //val = $("#well1 .tooltip-inner").html();
+        //splitted = val.split(' - ');
+        filterbyruntime($("#runtime").text());
+      });
+
+      $('#sl2').slider().on('slideStop', function(ev){
+        val = $("#ratinginput .tooltip-inner").html();
+        splitted = val.split(' - ');
+        $("#valdebug").text(splitted[0] + " to " + splitted[1]);
+        filterbyrating(val);
+      });
+
+      $('#sl3').slider().on('slideStop', function(ev){
+        val = $("#yearinput .tooltip-inner").html();
+        splitted = val.split(' - ');
+        $("#valdebug").text(splitted[0] + " to " + splitted[1]);
+        filterbyyear(val);
+      });
+  });
+
+  function filterbytitle(s){
+    if(s != ""){
+      var name_filter = "<b>Name</b> : " + s + " <sup id='close'>X</sup>";
+      $('#filters .name_filter').html(name_filter);
+      $('#filters .name_filter').attr('data-value',s);
+      dataretreive();
+    }
+  };
+
+  function filterbygenre(s){
+    if(s != ""){
+      var genre_filter = "<b>Genre</b> : " + s + " <sup id='close'>X</sup>";
+      $('#filters .genre_filter').html(genre_filter);
+      $('#filters .genre_filter').attr('data-value',s);
+      dataretreive();
+    }
+  };
+
+  function filterbyruntime(s){
+    if(s != ""){
+      var runtime_filter = "<b>Runtime (mins)</b> : " + s + " <sup id='close'>X</sup>";
+      $('#filters .runtime_filter').html(runtime_filter);
+      $('#filters .runtime_filter').attr('data-value',s);
+      dataretreive();
+    }
+  };
+
+  function filterbyrating(s){
+    if(s != ""){
+      var rating_filter = "<b>Rating</b> : " + s + " <sup id='close'>X</sup>";
+      $('#filters .rating_filter').html(rating_filter);
+      $('#filters .rating_filter').attr('data-value',s);
+      dataretreive();
+    }
+  };
+
+  function filterbyyear(s){
+    if(s != ""){
+      var year_filter = "<b>Year</b> : " + s + " <sup id='close'>X</sup>";
+      $('#filters .year_filter').html(year_filter);
+      $('#filters .year_filter').attr('data-value',s);
+      dataretreive();
+    }
+  };
+
+  $(document).on('click', '#close', function(){
+    $(this).parent().attr('data-value','');
+    $(this).parent().html("");
+    dataretreive();
+  });
+
+  function dataretreive(){
+
+    //alert("called");
+
+    queryparts = new Array();
+    
+    //alert(queryparts);
+
+    if ($('#filters .name_filter').attr('data-value')){
+      temp = "title=" + $('#filters .name_filter').attr('data-value');
+      //alert("name filter checked");
+      queryparts.push(temp);
+    }
+      
+    if ($('#filters .genre_filter').attr('data-value')){
+      temp = "genre=" + $('#filters .genre_filter').attr('data-value');
+      //alert("genre filter checked");
+      queryparts.push(temp);
+    }
+
+    if ($('#filters .runtime_filter').attr('data-value')){
+      temp = "runtime=" + $('#filters .runtime_filter').attr('data-value');
+      //alert("runtime filter checked");
+      queryparts.push(temp);
+    }
+
+    if ($('#filters .rating_filter').attr('data-value')){
+      temp = "rating=" + $('#filters .rating_filter').attr('data-value');
+      //alert("rating filter checked");
+      queryparts.push(temp);
+    }
+
+    if ($('#filters .year_filter').attr('data-value')){
+      temp = "year=" + $('#filters .year_filter').attr('data-value');
+      //alert("year filter checked");
+      queryparts.push(temp);
+    }
+
+    //alert(queryparts);
+
+    var query = queryparts.join("&");
+
+    //alert(query);
+
+    dbcall(query);
+
+  };
+
+  function dbcall(q){
+    $('.reswrapper').fadeOut("medium");
+    $('.loader').fadeIn("slow");
+    $.ajax({ 
+      type: 'POST', 
+      url: '/multidegreedata', 
+      data: q,
+      success: function(data){
+        //alert(data[0].link);
+        result = "";
+        if (data == ""){
+          result += "<b>No results found with the given search filters</b>"
+        }
+        else{
+          for (x in data){
+            result += "<div class='res'> <div style='width:100%;'> <a href='"+ data[x].link +"'>"+ data[x].title +"</a> <span style='float:right;'><b>Year</b> : "+ data[x].year +"</span> </div> <ul style='list-style-type:none; margin: 5px 0 5px 15px;'> <li style='padding:1px;'><b>Genre</b> : "+ data[x].genre +"</li> <li style='padding:1px;'><b>Rating</b> : "+ data[x].rating +" / 10</li> <li style='padding:1px;'><b>Runtime </b>(mins) : "+ data[x].runtime +"</li> </ul> </div>";
+          }
+        }
+        $('.reswrapper').html(result);
+        $('.loader').fadeOut("slow");
+        $('.reswrapper').fadeIn("slow");
+      } 
+    });
+  };
+  /*
+  function filterbytitle(s){
+    if(s != ""){
+      $('.reswrapper').fadeOut("medium");
+      $('.loader').fadeIn("slow");
+      var name_filter = "<b>Name</b> : " + s + " <sup id='close'>X</sup>";
+      //alert(name_filter);
+      $('#filters .name_filter').html(name_filter);
+      $('#filters .name_filter').attr('data-value',s);
+      var query = 'title='+s;
+      $.ajax({ 
+        type: 'POST', 
+        url: '/testpost', 
+        data: query,
+        success: function(data){
+          //alert(data[0].link);
+          result = "";
+          for (x in data){
+            result += "<div class='res'> <div style='width:100%;'> <a href='"+ data[x].link +"'>"+ data[x].title +"</a> <span style='float:right;'><b>Year</b> : "+ data[x].year +"</span> </div> <ul style='list-style-type:none; margin: 5px 0 5px 15px;'> <li style='padding:1px;'><b>Genre</b> : "+ data[x].genre +"</li> <li style='padding:1px;'><b>Rating</b> : "+ data[x].rating +" / 10</li> <li style='padding:1px;'><b>Runtime </b>(mins) : "+ data[x].runtime +"</li> </ul> </div>";
+          }
+          $('.reswrapper').html(result);
+          $('.loader').fadeOut("slow");
+          $('.reswrapper').fadeIn("slow");
+        } 
+      });
+    }
+  };
+  function filterbygenre(s){
+    $('.reswrapper').fadeOut("medium");
+    $('.loader').fadeIn("medium");
+    var genre_filter = "<b>Genre</b> : " + s + " <sup id='close'>X</sup>";
+    $('#filters .genre_filter').html(genre_filter);
+    $('#filters .genre_filter').attr('data-value',s);
+    $.ajax({ 
+      type: 'POST', 
+      url: '/testpost', 
+      data: {'genre' : s},
+      success: function(data){
+        //alert(data[0].title)
+        result = "";
+        for (x in data){
+          result += "<div class='res'> <div style='width:100%;'> <a href='"+ data[x].link +"'>"+ data[x].title +"</a> <span style='float:right;'><b>Year</b> : "+ data[x].year +"</span> </div> <ul style='list-style-type:none; margin: 5px 0 5px 15px;'> <li style='padding:1px;'><b>Genre</b> : "+ data[x].genre +"</li> <li style='padding:1px;'><b>Rating</b> : "+ data[x].rating +" / 10</li> <li style='padding:1px;'><b>Runtime </b>(mins) : "+ data[x].runtime +"</li> </ul> </div>";
+        }
+        $('.reswrapper').html(result);
+        $('.loader').fadeOut("slow");
+        $('.reswrapper').fadeIn("slow");
+      } 
+    });
+  };
+  function filterbyruntime(s){
+    $('.reswrapper').fadeOut("medium");
+    $('.loader').fadeIn("medium");
+    var runtime_filter = "<b>Runtime</b> : " + s + " <sup id='close'>X</sup>";
+    $('#filters .runtime_filter').html(runtime_filter);
+    $('#filters .runtime_filter').attr('data-value',s);
+    $.ajax({ 
+      type: 'POST', 
+      url: '/testpost', 
+      data: {'runtime' : s},
+      success: function(data){
+        result = "";
+        for (x in data){
+          result += "<div class='res'> <div style='width:100%;'> <a href='"+ data[x].link +"'>"+ data[x].title +"</a> <span style='float:right;'><b>Year</b> : "+ data[x].year +"</span> </div> <ul style='list-style-type:none; margin: 5px 0 5px 15px;'> <li style='padding:1px;'><b>Genre</b> : "+ data[x].genre +"</li> <li style='padding:1px;'><b>Rating</b> : "+ data[x].rating +" / 10</li> <li style='padding:1px;'><b>Runtime </b>(mins) : "+ data[x].runtime +"</li> </ul> </div>";
+        }
+        $('.reswrapper').html(result);
+        $('.loader').fadeOut("slow");
+        $('.reswrapper').fadeIn("slow");
+      } 
+    });
+  };
+  function filterbyrating(s){
+    $('.reswrapper').fadeOut("medium");
+    $('.loader').fadeIn("medium");
+    var rating_filter = "<b>Runtime</b> : " + s + " <sup id='close'>X</sup>";
+    $('#filters .rating_filter').html(rating_filter);
+    $('#filters .rating_filter').attr('data-value',s);
+    $.ajax({ 
+      type: 'POST', 
+      url: '/testpost', 
+      data: {'rating' : s},
+      success: function(data){
+        result = "";
+        for (x in data){
+          result += "<div class='res'> <div style='width:100%;'> <a href='"+ data[x].link +"'>"+ data[x].title +"</a> <span style='float:right;'><b>Year</b> : "+ data[x].year +"</span> </div> <ul style='list-style-type:none; margin: 5px 0 5px 15px;'> <li style='padding:1px;'><b>Genre</b> : "+ data[x].genre +"</li> <li style='padding:1px;'><b>Rating</b> : "+ data[x].rating +" / 10</li> <li style='padding:1px;'><b>Runtime </b>(mins) : "+ data[x].runtime +"</li> </ul> </div>";
+        }
+        $('.reswrapper').html(result);
+        $('.loader').fadeOut("slow");
+        $('.reswrapper').fadeIn("slow");
+      } 
+    });
+  };
+  function filterbyyear(s){
+    $('.reswrapper').fadeOut("medium");
+    $('.loader').fadeIn("medium");
+    var year_filter = "<b>Year</b> : " + s + " <sup id='close'>X</sup>";
+    $('#filters .year_filter').html(year_filter);
+    $('#filters .year_filter').attr('data-value',s);
+    $.ajax({ 
+      type: 'POST', 
+      url: '/testpost', 
+      data: {'year' : s},
+      success: function(data){
+        //alert(data[0].title);
+        result = "";
+        for (x in data){
+          result += "<div class='res'> <div style='width:100%;'> <a href='"+ data[x].link +"'>"+ data[x].title +"</a> <span style='float:right;'><b>Year</b> : "+ data[x].year +"</span> </div> <ul style='list-style-type:none; margin: 5px 0 5px 15px;'> <li style='padding:1px;'><b>Genre</b> : "+ data[x].genre +"</li> <li style='padding:1px;'><b>Rating</b> : "+ data[x].rating +" / 10</li> <li style='padding:1px;'><b>Runtime </b>(mins) : "+ data[x].runtime +"</li> </ul> </div>";
+        }
+        $('.reswrapper').html(result);
+        $('.loader').fadeOut("slow");
+        $('.reswrapper').fadeIn("slow");
+      } 
+    });
+  };*/
+</script> 

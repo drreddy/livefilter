@@ -1,0 +1,19 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  title: MyText
+  director: MyText
+  rating: MyText
+  runtime: MyText
+  year: MyText
+  genre: MyText
+  link: MyText
+
+two:
+  title: MyText
+  director: MyText
+  rating: MyText
+  runtime: MyText
+  year: MyText
+  genre: MyText
+  link: MyText
